@@ -3,7 +3,12 @@ const cors = require("cors");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type"]
+}));
+
 app.use(express.json());
 
 // temporary in-memory storage
@@ -16,53 +21,80 @@ app.get("/", (req, res) => {
 
 // ===================== RUN PYTHON =====================
 app.post("/run_python", (req, res) => {
-  const { code } = req.body;
+  try {
+    const { code } = req.body;
 
-  res.json({
-    output: `✅ Code received:\n${code}`,
-    error: "",
-    has_syntax_error: false
-  });
+    return res.status(200).json({
+      output: `✅ Code received:\n${code}`,
+      error: "",
+      has_syntax_error: false
+    });
+  } catch (err) {
+    return res.status(500).json({
+      error: "Server error",
+      details: err.message
+    });
+  }
 });
 
 // ===================== ANALYZE =====================
 app.post("/analyze", (req, res) => {
-  res.json({
-    score: 9,
-    friendly_explanations: ["Code looks clean 👍"],
-    suggestions: ["Try adding comments for better readability"],
-    suggested_code: null
-  });
+  try {
+    return res.status(200).json({
+      score: 9,
+      friendly_explanations: ["Code looks clean 👍"],
+      suggestions: ["Try adding comments for better readability"],
+      suggested_code: null
+    });
+  } catch (err) {
+    return res.status(500).json({
+      error: "Analysis failed"
+    });
+  }
 });
 
 // ===================== GET USER CODES =====================
 app.post("/my_codes", (req, res) => {
-  const { email } = req.body;
+  try {
+    const { email } = req.body;
 
-  res.json({
-    codes: codes.filter(c => c.email === email),
-  });
+    return res.status(200).json({
+      codes: codes.filter(c => c.email === email),
+    });
+  } catch (err) {
+    return res.status(500).json({
+      codes: []
+    });
+  }
 });
 
 // ===================== SAVE CODE =====================
 app.post("/save_code", (req, res) => {
-  const { email, title, codeSnippet, score } = req.body;
+  try {
+    const { email, title, codeSnippet, score } = req.body;
 
-  codes.push({ email, title, code: codeSnippet, score });
+    codes.push({ email, title, code: codeSnippet, score });
 
-  res.json({ success: true });
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ success: false });
+  }
 });
 
 // ===================== DELETE CODE =====================
 app.post("/delete_code", (req, res) => {
-  const { email, index } = req.body;
+  try {
+    const { email, index } = req.body;
 
-  const userCodes = codes.filter(c => c.email === email);
-  const realItem = userCodes[index];
+    const userCodes = codes.filter(c => c.email === email);
+    const realItem = userCodes[index];
 
-  codes = codes.filter(c => c !== realItem);
+    codes = codes.filter(c => c !== realItem);
 
-  res.json({ success: true });
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ success: false });
+  }
 });
 
 // ===================== START SERVER =====================
