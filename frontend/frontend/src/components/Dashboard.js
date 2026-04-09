@@ -10,13 +10,15 @@ function Dashboard() {
 
   const email = localStorage.getItem("userEmail");
 
+  const BASE_URL = "https://opticodex-backend.onrender.com";
+
   // Load codes
   const loadCodes = useCallback(async () => {
     if (!email) return;
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/my_codes", {
+      const res = await fetch(`${BASE_URL}/my_codes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -43,7 +45,7 @@ function Dashboard() {
   // DELETE
   const deleteCode = async (index) => {
     try {
-      const res = await fetch("http://localhost:5000/delete_code", {
+      const res = await fetch(`${BASE_URL}/delete_code`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
