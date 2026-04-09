@@ -9,12 +9,33 @@ app.use(express.json());
 // temporary in-memory storage
 let codes = [];
 
-// ✅ ROOT ROUTE (fixes "Cannot GET /")
+// ✅ ROOT ROUTE
 app.get("/", (req, res) => {
   res.send("🚀 Opticodex Backend is running!");
 });
 
-// GET USER CODES
+// ===================== RUN PYTHON =====================
+app.post("/run_python", (req, res) => {
+  const { code } = req.body;
+
+  res.json({
+    output: `✅ Code received:\n${code}`,
+    error: "",
+    has_syntax_error: false
+  });
+});
+
+// ===================== ANALYZE =====================
+app.post("/analyze", (req, res) => {
+  res.json({
+    score: 9,
+    friendly_explanations: ["Code looks clean 👍"],
+    suggestions: ["Try adding comments for better readability"],
+    suggested_code: null
+  });
+});
+
+// ===================== GET USER CODES =====================
 app.post("/my_codes", (req, res) => {
   const { email } = req.body;
 
@@ -23,16 +44,16 @@ app.post("/my_codes", (req, res) => {
   });
 });
 
-// SAVE CODE
+// ===================== SAVE CODE =====================
 app.post("/save_code", (req, res) => {
-  const { email, title, code } = req.body;
+  const { email, title, codeSnippet, score } = req.body;
 
-  codes.push({ email, title, code });
+  codes.push({ email, title, code: codeSnippet, score });
 
   res.json({ success: true });
 });
 
-// DELETE CODE
+// ===================== DELETE CODE =====================
 app.post("/delete_code", (req, res) => {
   const { email, index } = req.body;
 
@@ -44,7 +65,7 @@ app.post("/delete_code", (req, res) => {
   res.json({ success: true });
 });
 
-// ✅ IMPORTANT: use dynamic port for Render
+// ===================== START SERVER =====================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
