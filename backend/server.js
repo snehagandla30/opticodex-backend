@@ -9,6 +9,12 @@ app.use(express.json());
 // temporary in-memory storage
 let codes = [];
 
+// ✅ ROOT ROUTE (fixes "Cannot GET /")
+app.get("/", (req, res) => {
+  res.send("🚀 Opticodex Backend is running!");
+});
+
+// GET USER CODES
 app.post("/my_codes", (req, res) => {
   const { email } = req.body;
 
@@ -17,6 +23,7 @@ app.post("/my_codes", (req, res) => {
   });
 });
 
+// SAVE CODE
 app.post("/save_code", (req, res) => {
   const { email, title, code } = req.body;
 
@@ -25,11 +32,11 @@ app.post("/save_code", (req, res) => {
   res.json({ success: true });
 });
 
+// DELETE CODE
 app.post("/delete_code", (req, res) => {
   const { email, index } = req.body;
 
   const userCodes = codes.filter(c => c.email === email);
-
   const realItem = userCodes[index];
 
   codes = codes.filter(c => c !== realItem);
@@ -37,6 +44,9 @@ app.post("/delete_code", (req, res) => {
   res.json({ success: true });
 });
 
-app.listen(5000, () => {
-  console.log("Backend running on http://localhost:5000");
+// ✅ IMPORTANT: use dynamic port for Render
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Backend running on port ${PORT}`);
 });
